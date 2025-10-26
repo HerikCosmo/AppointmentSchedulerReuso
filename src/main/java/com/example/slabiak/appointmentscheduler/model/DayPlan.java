@@ -9,6 +9,8 @@ public class DayPlan {
     private TimePeroid workingHours;
     private List<TimePeroid> breaks;
 
+    private List<TimePeroid> timePeroidsWithBreaksExcluded;
+
     public DayPlan() {
         breaks = new ArrayList();
     }
@@ -70,6 +72,15 @@ public class DayPlan {
 
     public void addBreak(TimePeroid breakToAdd) {
         breaks.add(breakToAdd);
+    }
+
+    // !!! ADICIONE OS GETTERS E SETTERS PARA O CAMPO NOVO !!!
+    public List<TimePeroid> getTimePeroidsWithBreaksExcluded() {
+        return timePeroidsWithBreaksExcluded;
+    }
+
+    public void setTimePeroidsWithBreaksExcluded(List<TimePeroid> timePeroidsWithBreaksExcluded) {
+        this.timePeroidsWithBreaksExcluded = timePeroidsWithBreaksExcluded;
     }
 
 }

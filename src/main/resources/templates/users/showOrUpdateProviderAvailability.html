@@ -23,9 +23,11 @@
                 <tr>
                     <td>Monday</td>
                     <td><input type="time" th:field="*{monday.workingHours.start}"
-                               th:value="${plan.monday.workingHours.start}"></td>
+                               th:value="${#temporals.format(plan.monday.workingHours.start, 'HH:mm')}"></td>
+
                     <td><input type="time" th:field="*{monday.workingHours.end}"
-                               th:value="${plan.monday.workingHours.end}"></td>
+                               th:value="${#temporals.format(plan.monday.workingHours.end, 'HH:mm')}"></td>
+
                     <td><span th:text="${plan.monday.breaks.size()}">3</span></td>
                 </tr>
                 <tr>

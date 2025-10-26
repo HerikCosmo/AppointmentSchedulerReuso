@@ -1,11 +1,14 @@
 package com.example.slabiak.appointmentscheduler.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.time.LocalTime;
 import java.util.Objects;
 
 public class TimePeroid implements Comparable<TimePeroid> {
-
+    @JsonDeserialize(using = LocalTimeArrayDeserializer.class)
     private LocalTime start;
+    @JsonDeserialize(using = LocalTimeArrayDeserializer.class)
     private LocalTime end;
 
     public TimePeroid() {
