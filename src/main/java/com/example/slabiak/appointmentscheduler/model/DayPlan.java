@@ -74,7 +74,6 @@ public class DayPlan {
         breaks.add(breakToAdd);
     }
 
-    // !!! ADICIONE OS GETTERS E SETTERS PARA O CAMPO NOVO !!!
     public List<TimePeroid> getTimePeroidsWithBreaksExcluded() {
         return timePeroidsWithBreaksExcluded;
     }
