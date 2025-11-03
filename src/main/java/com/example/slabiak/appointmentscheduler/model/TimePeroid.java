@@ -2,6 +2,8 @@ package com.example.slabiak.appointmentscheduler.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 
@@ -62,5 +64,15 @@ public class TimePeroid implements Comparable<TimePeroid> {
                 "start=" + start +
                 ", end=" + end +
                 '}';
+    }
+
+    public boolean overLaps(LocalDateTime start, LocalDateTime end){
+        LocalDateTime thisStart = LocalDateTime.of(LocalDate.of(2000, 1, 1), this.start);
+        LocalDateTime thisEnd = LocalDateTime.of(LocalDate.of(2000, 1, 1), this.end);
+
+        LocalDateTime targetStart = LocalDateTime.of(LocalDate.of(2000, 1, 1), start.toLocalTime());
+        LocalDateTime targetEnd = LocalDateTime.of(LocalDate.of(2000, 1, 1), end.toLocalTime());
+
+        return targetStart.isBefore(thisEnd) && targetEnd.isAfter(thisStart);
     }
 }

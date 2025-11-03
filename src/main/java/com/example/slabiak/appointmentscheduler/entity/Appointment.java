@@ -164,4 +164,38 @@ public class Appointment extends BaseEntity implements Comparable<Appointment> {
     public void setExchangeRequest(ExchangeRequest exchangeRequest) {
         this.exchangeRequest = exchangeRequest;
     }
+
+    public boolean isOwnedByCustomer(int customerId){
+        return this.customer != null && this.customer.getId() == customerId;
+    }
+
+    public boolean isOwnedByProvider(int providerId){
+        return this.provider != null && this.provider.getId() == providerId;
+    }
+
+    public boolean isAlreadyCanceled(){
+        return this.status == AppointmentStatus.CANCELED;
+    }
+
+    public boolean isPendingRejection(){
+        return this.exchangeRequest != null && !this.isAlreadyCanceled();
+    }
+
+    public void cancel(User canceler){
+        this.status = AppointmentStatus.CANCELED;
+        this.canceledAt = LocalDateTime.now();
+        this.canceler = canceler;
+    }
+
+    public boolean isRejectionRequested(){
+        return this.status == AppointmentStatus.REJECTION_REQUESTED;
+    }
+
+    public void setRejectionRequested(boolean requested){
+        if(requested){
+            this.status = AppointmentStatus.REJECTION_REQUESTED;
+        } else if(this.status == AppointmentStatus.REJECTION_REQUESTED){
+            this.status = AppointmentStatus.FINISHED;
+        }
+    }
 }
