@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,4 +53,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query("select a from Appointment a where a.status = 'EXCHANGE_REQUESTED' and a.start <= :start")
     List<Appointment> findExchangeRequestedWithStartBefore(@Param("start") LocalDateTime date);
 
+    @Query("SELECT a FROM Appointment a WHERE a.provider.id = :providerId AND DATE(a.start) = :date")
+    List<Appointment> findByProviderAndDay(@Param("providerId") int providerId, @Param("date") LocalDate date);   
 }

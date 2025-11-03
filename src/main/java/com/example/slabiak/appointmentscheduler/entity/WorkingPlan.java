@@ -10,7 +10,12 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @TypeDefs(@TypeDef(name = "json", typeClass = JsonStringType.class))
 @Entity
@@ -174,5 +179,44 @@ public class WorkingPlan {
         wp.setSaturday(defaultDayPlan);
         wp.setSunday(defaultDayPlan);
         return wp;
+    }
+
+    public List<TimePeroid> getAvailableTimePeroids(LocalDate date){
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        DayPlan dayPlan;
+
+         switch (dayOfWeek) {
+        case MONDAY:
+            dayPlan = monday;
+            break;
+        case TUESDAY:
+            dayPlan = tuesday;
+            break;
+        case WEDNESDAY:
+            dayPlan = wednesday;
+            break;
+        case THURSDAY:
+            dayPlan = thursday;
+            break;
+        case FRIDAY:
+            dayPlan = friday;
+            break;
+        case SATURDAY:
+            dayPlan = saturday;
+            break;
+        case SUNDAY:
+            dayPlan = sunday;
+            break;
+        default:
+            return new ArrayList<>();
+        }
+
+        if(dayPlan != null && dayPlan.getWorkingHours() != null){
+            List<TimePeroid> available = new ArrayList<>();
+            available.add(dayPlan.getWorkingHours());
+            return available;
+        }
+        
+        return new ArrayList<>();
     }
 }

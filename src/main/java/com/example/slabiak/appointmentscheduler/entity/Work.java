@@ -1,8 +1,9 @@
 package com.example.slabiak.appointmentscheduler.entity;
 
-import com.example.slabiak.appointmentscheduler.entity.user.User;
+import com.example.slabiak.appointmentscheduler.entity.user.provider.Provider;
 
 import javax.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class Work extends BaseEntity {
 
     @ManyToMany
     @JoinTable(name = "works_providers", joinColumns = @JoinColumn(name = "id_work"), inverseJoinColumns = @JoinColumn(name = "id_user"))
-    private List<User> providers;
+    private List<Provider> providers;
 
     public Work() {
     }
@@ -66,11 +67,11 @@ public class Work extends BaseEntity {
         this.duration = duration;
     }
 
-    public List<User> getProviders() {
+    public List<Provider> getProviders() {
         return providers;
     }
 
-    public void setProviders(List<User> providers) {
+    public void setProviders(List<Provider> providers) {
         this.providers = providers;
     }
 
