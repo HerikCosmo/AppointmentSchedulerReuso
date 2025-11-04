@@ -106,7 +106,7 @@ public class RetailCustomerUserServiceTest {
     @Test
     public void shouldSaveNewRetailCustomer() {
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.saveNewRetailCustomer(retailUserForm);
+        userService.saveNewUser(retailUserForm);
 
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
     }
@@ -116,7 +116,7 @@ public class RetailCustomerUserServiceTest {
         when(passwordEncoder.encode(password)).thenReturn(passwordEncoded);
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.saveNewRetailCustomer(retailUserForm);
+        userService.saveNewUser(retailUserForm);
 
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().getPassword(), passwordEncoded);
@@ -126,7 +126,7 @@ public class RetailCustomerUserServiceTest {
     public void userFormDataShouldMatchRetailCustomerObject() {
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.saveNewRetailCustomer(retailUserForm);
+        userService.saveNewUser(retailUserForm);
 
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().getUserName(), retailUserForm.getUserName());
@@ -145,7 +145,7 @@ public class RetailCustomerUserServiceTest {
         doReturn(roleCustomer).when(roleRepository).findByName(roleNameCustomer);
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.saveNewRetailCustomer(retailUserForm);
+        userService.saveNewUser(retailUserForm);
 
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().getRoles().size(), 2);
@@ -157,7 +157,7 @@ public class RetailCustomerUserServiceTest {
         doReturn(roleCustomer).when(roleRepository).findByName(roleNameCustomer);
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.saveNewRetailCustomer(retailUserForm);
+        userService.saveNewUser(retailUserForm);
 
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().hasRole(roleNameRetailCustomer), true);
@@ -172,7 +172,7 @@ public class RetailCustomerUserServiceTest {
         doReturn(customerToBeUpdated).when(retailCustomerRepository).getOne(userId);
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.updateRetailCustomerProfile(retailUserForm);
+        userService.updateUserProfile(retailUserForm);
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().getFirstName(), retailUserForm.getFirstName());
         assertEquals(argumentCaptor.getValue().getLastName(), retailUserForm.getLastName());
@@ -194,7 +194,7 @@ public class RetailCustomerUserServiceTest {
         doReturn(customerToBeUpdated).when(retailCustomerRepository).getOne(userId);
 
         ArgumentCaptor<RetailCustomer> argumentCaptor = ArgumentCaptor.forClass(RetailCustomer.class);
-        userService.updateRetailCustomerProfile(retailUserForm);
+        userService.updateUserProfile(retailUserForm);
         verify(retailCustomerRepository, times(1)).save(argumentCaptor.capture());
         assertEquals(argumentCaptor.getValue().getUserName(), currentUsername);
         assertEquals(argumentCaptor.getValue().getPassword(), currentPassword);
@@ -208,7 +208,7 @@ public class RetailCustomerUserServiceTest {
         retailCustomer.setUserName(userName);
         optionalRetailCustomer = Optional.of(retailCustomer);
         when(retailCustomerRepository.findById(userId)).thenReturn(optionalRetailCustomer);
-        assertEquals(optionalRetailCustomer.get(), userService.getRetailCustomerById(userId));
+        assertEquals(optionalRetailCustomer.get(), userService.getUserById(userId));
         verify(retailCustomerRepository, times(1)).findById(userId);
     }
 

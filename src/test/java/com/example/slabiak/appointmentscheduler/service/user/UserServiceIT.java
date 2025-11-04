@@ -25,9 +25,9 @@ public class UserServiceIT {
     public void shouldSaveNewRetailCustomer() {
         UserForm userForm = UserFactoryTest.prepareSampleUserForm();
 
-        userService.saveNewRetailCustomer(userForm);
+        userService.saveNewUser(userForm);
 
-        assertThat(userService.getAllRetailCustomers()).hasSize(2);
+        assertThat(userService.getAllUsers()).hasSize(2);
     }
 
 }

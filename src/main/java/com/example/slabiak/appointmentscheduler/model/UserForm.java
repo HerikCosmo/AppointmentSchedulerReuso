@@ -5,6 +5,7 @@ import com.example.slabiak.appointmentscheduler.entity.user.User;
 import com.example.slabiak.appointmentscheduler.entity.user.customer.CorporateCustomer;
 import com.example.slabiak.appointmentscheduler.entity.user.customer.RetailCustomer;
 import com.example.slabiak.appointmentscheduler.entity.user.provider.Provider;
+import com.example.slabiak.appointmentscheduler.model.enums.UserType;
 import com.example.slabiak.appointmentscheduler.validation.FieldsMatches;
 import com.example.slabiak.appointmentscheduler.validation.UniqueUsername;
 import com.example.slabiak.appointmentscheduler.validation.groups.*;
@@ -18,6 +19,9 @@ public class UserForm {
     @NotNull(groups = {UpdateUser.class})
     @Min(value = 1, groups = {UpdateUser.class})
     private int id;
+
+    @NotNull(groups = {CreateUser.class}, message = "User type must be specified")
+    private UserType userType;
 
     @UniqueUsername(groups = {CreateUser.class})
     @Size(min = 5, max = 15, groups = {CreateUser.class}, message = "Username should have 5-15 letters")
@@ -92,16 +96,19 @@ public class UserForm {
     public UserForm(Provider provider) {
         this((User) provider);
         this.setWorks(provider.getWorks());
+        this.setUserType(UserType.PROVIDER);
     }
 
     public UserForm(RetailCustomer retailCustomer) {
         this((User) retailCustomer);
+        this.setUserType(UserType.RETAIL_CUSTOMER);
     }
 
     public UserForm(CorporateCustomer corporateCustomer) {
         this((User) corporateCustomer);
         this.setCompanyName(corporateCustomer.getCompanyName());
         this.setVatNumber(corporateCustomer.getVatNumber());
+        this.setUserType(UserType.CORPORATE_CUSTOMER);
     }
 
     public int getId() {
@@ -110,6 +117,14 @@ public class UserForm {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public UserType getUserType(){
+        return userType;
+    }
+
+    public void setUserType(UserType userType){
+        this.userType = userType;
     }
 
     public String getUserName() {
