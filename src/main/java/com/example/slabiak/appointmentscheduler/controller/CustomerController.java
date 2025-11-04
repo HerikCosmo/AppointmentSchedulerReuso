@@ -3,6 +3,7 @@ package com.example.slabiak.appointmentscheduler.controller;
 import com.example.slabiak.appointmentscheduler.entity.user.customer.Customer;
 import com.example.slabiak.appointmentscheduler.model.ChangePasswordForm;
 import com.example.slabiak.appointmentscheduler.model.UserForm;
+import com.example.slabiak.appointmentscheduler.model.enums.UserType;
 import com.example.slabiak.appointmentscheduler.security.CustomUserDetails;
 import com.example.slabiak.appointmentscheduler.service.AppointmentService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
@@ -43,13 +44,13 @@ public class CustomerController {
         Customer customer = userService.getCustomerById(id);
         if (customer.hasRole("ROLE_CUSTOMER_CORPORATE")) {
             if (!model.containsAttribute("user")) {
-                model.addAttribute("user", new UserForm(userService.getCorporateCustomerById(id)));
+                model.addAttribute("user", new UserForm(userService.getUserById(id)));
             }
             model.addAttribute("account_type", "customer_corporate");
             model.addAttribute("formActionProfile", "/customers/corporate/update/profile");
         } else if (customer.hasRole("ROLE_CUSTOMER_RETAIL")) {
             if (!model.containsAttribute("user")) {
-                model.addAttribute("user", new UserForm(userService.getRetailCustomerById(id)));
+                model.addAttribute("user", new UserForm(userService.getUserById(id)));
             }
             model.addAttribute("account_type", "customer_retail");
             model.addAttribute("formActionProfile", "/customers/retail/update/profile");
@@ -70,7 +71,8 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("user", user);
             return "redirect:/customers/" + user.getId();
         }
-        userService.updateCorporateCustomerProfile(user);
+        user.setUserType(UserType.CORPORATE_CUSTOMER);
+        userService.updateUserProfile(user);
         return "redirect:/customers/" + user.getId();
     }
 
@@ -81,7 +83,8 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("user", user);
             return "redirect:/customers/" + user.getId();
         }
-        userService.updateRetailCustomerProfile(user);
+        user.setUserType(UserType.RETAIL_CUSTOMER);
+        userService.updateUserProfile(user);
         return "redirect:/customers/" + user.getId();
     }
 
@@ -111,7 +114,8 @@ public class CustomerController {
             populateModel(model, userForm, "customer_retail", "/customers/new/retail", null);
             return "users/createUserForm";
         }
-        userService.saveNewRetailCustomer(userForm);
+        userForm.setUserType(UserType.RETAIL_CUSTOMER);
+        userService.saveNewUser(userForm);
         model.addAttribute("createdUserName", userForm.getUserName());
         return "users/login";
     }
@@ -122,7 +126,8 @@ public class CustomerController {
             populateModel(model, userForm, "customer_corporate", "/customers/new/corporate", null);
             return "users/createUserForm";
         }
-        userService.saveNewCorporateCustomer(userForm);
+        userForm.setUserType(UserType.CORPORATE_CUSTOMER);
+        userService.saveNewUser(userForm);
         model.addAttribute("createdUserName", userForm.getUserName());
         return "users/login";
     }

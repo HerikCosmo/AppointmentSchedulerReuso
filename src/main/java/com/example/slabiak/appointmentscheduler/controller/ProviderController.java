@@ -4,6 +4,7 @@ import com.example.slabiak.appointmentscheduler.entity.WorkingPlan;
 import com.example.slabiak.appointmentscheduler.model.ChangePasswordForm;
 import com.example.slabiak.appointmentscheduler.model.TimePeroid;
 import com.example.slabiak.appointmentscheduler.model.UserForm;
+import com.example.slabiak.appointmentscheduler.model.enums.UserType;
 import com.example.slabiak.appointmentscheduler.security.CustomUserDetails;
 import com.example.slabiak.appointmentscheduler.service.AppointmentService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
@@ -76,7 +77,8 @@ public class ProviderController {
             redirectAttributes.addFlashAttribute("user", userUpdateData);
             return "redirect:/providers/" + userUpdateData.getId();
         }
-        userService.updateProviderProfile(userUpdateData);
+        userUpdateData.setUserType(UserType.PROVIDER);
+        userService.updateUserProfile(userUpdateData);
         return "redirect:/providers/" + userUpdateData.getId();
     }
 
@@ -96,7 +98,8 @@ public class ProviderController {
             redirectAttributes.addFlashAttribute("user", userForm);
             return "redirect:/providers/new";
         }
-        userService.saveNewProvider(userForm);
+        userForm.setUserType(UserType.PROVIDER);
+        userService.saveNewUser(userForm);
         return "redirect:/providers/all";
     }
 
