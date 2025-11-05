@@ -103,7 +103,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @EventListener
     public void handleAppointmentCanceledByProvider(AppointmentCanceledByProviderEvent event) {
-        new AppointmentCanceledByCustomerNotification(event.getAppointment(), this, emailService, mailingEnabled)
+        new AppointmentCanceledByProviderNotification(event.getAppointment(), this, emailService, mailingEnabled)
                 .sendNotification(true);
     }
 
