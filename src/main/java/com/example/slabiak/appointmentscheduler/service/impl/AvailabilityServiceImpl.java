@@ -30,11 +30,16 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     @Override
     public List<TimePeroid> getAvailableHours(int providerId, int customerId, int workId, LocalDate date) {
         Work work = workRepository.findById(workId).orElseThrow(() -> new IllegalArgumentException("Work not found."));
-        Provider provider = work.getProviders().get(workId);
+        Provider provider = work.getProviders().stream()
+                .filter(p -> p.getId().equals(providerId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Provider not found."));
 
         List<TimePeroid> providerTimeSlots = provider.getWorkingPlan().getAvailableTimePeroids(date);
 
-        List<Appointment> appointments = appointmentRepository.findByProviderAndDay(providerId,date);
+        LocalDateTime dayStart = date.atStartOfDay();
+        LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+        List<Appointment> appointments = appointmentRepository.findByProviderIdAndStartBetween(providerId,dayStart, dayEnd);
 
         List<TimePeroid> available = excludeAppointmentsFromTimePeroids(providerTimeSlots, appointments);
 

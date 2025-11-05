@@ -8,7 +8,10 @@ import com.example.slabiak.appointmentscheduler.entity.ExchangeRequest;
 import com.example.slabiak.appointmentscheduler.entity.ExchangeStatus;
 import com.example.slabiak.appointmentscheduler.entity.user.customer.Customer;
 import com.example.slabiak.appointmentscheduler.service.ExchangeService;
-import com.example.slabiak.appointmentscheduler.service.NotificationService;
+import com.example.slabiak.appointmentscheduler.service.impl.event.ExchangeAcceptedEvent;
+import com.example.slabiak.appointmentscheduler.service.impl.event.ExchangeRejectedEvent;
+import com.example.slabiak.appointmentscheduler.service.impl.event.ExchangeRequestedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,13 +21,13 @@ import java.util.List;
 public class ExchangeServiceImpl implements ExchangeService {
 
     private final AppointmentRepository appointmentRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
     private final ExchangeRequestRepository exchangeRequestRepository;
 
-    public ExchangeServiceImpl(AppointmentRepository appointmentRepository, NotificationService notificationService, ExchangeRequestRepository exchangeRequestRepository) {
+    public ExchangeServiceImpl(AppointmentRepository appointmentRepository, ExchangeRequestRepository exchangeRequestRepository, ApplicationEventPublisher eventPublisher) {
         this.appointmentRepository = appointmentRepository;
-        this.notificationService = notificationService;
         this.exchangeRequestRepository = exchangeRequestRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         exchangeRequestRepository.save(exchangeRequest);
         appointmentRepository.save(requested);
         appointmentRepository.save(requestor);
-        notificationService.newExchangeAcceptedNotification(exchangeRequest, true);
+        eventPublisher.publishEvent(new ExchangeAcceptedEvent(requestor.getExchangeRequest()));
         return true;
     }
 
@@ -79,7 +82,7 @@ public class ExchangeServiceImpl implements ExchangeService {
         requestor.setStatus(AppointmentStatus.SCHEDULED);
         exchangeRequestRepository.save(exchangeRequest);
         appointmentRepository.save(requestor);
-        notificationService.newExchangeRejectedNotification(exchangeRequest, true);
+        eventPublisher.publishEvent(new ExchangeRejectedEvent(exchangeRequest));
         return true;
     }
 
@@ -92,7 +95,7 @@ public class ExchangeServiceImpl implements ExchangeService {
             appointmentRepository.save(oldAppointment);
             ExchangeRequest exchangeRequest = new ExchangeRequest(oldAppointment, newAppointment, ExchangeStatus.PENDING);
             exchangeRequestRepository.save(exchangeRequest);
-            notificationService.newExchangeRequestedNotification(oldAppointment, newAppointment, true);
+            eventPublisher.publishEvent(new ExchangeRequestedEvent(oldAppointment, newAppointment));
             return true;
         }
         return false;

@@ -2,6 +2,8 @@ package com.example.slabiak.appointmentscheduler.service.impl;
 
 import java.time.LocalDateTime;
 
+import com.example.slabiak.appointmentscheduler.service.impl.event.ChatMessageEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,7 +13,6 @@ import com.example.slabiak.appointmentscheduler.entity.ChatMessage;
 import com.example.slabiak.appointmentscheduler.entity.user.User;
 import com.example.slabiak.appointmentscheduler.service.AppointmentManagementService;
 import com.example.slabiak.appointmentscheduler.service.AppointmentChatService;
-import com.example.slabiak.appointmentscheduler.service.NotificationService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
 
 @Service
@@ -20,16 +21,16 @@ public class AppointmentChatServiceImpl implements AppointmentChatService{
     private final AppointmentManagementService managementService;
     private final UserService userService;
     private final ChatMessageRepository chatMessageRepository;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AppointmentChatServiceImpl(AppointmentManagementService managementService,
                                       UserService userService,
                                       ChatMessageRepository chatMessageRepository,
-                                      NotificationService notificationService) {
+                                      ApplicationEventPublisher eventPublisher) {
         this.managementService = managementService;
         this.userService = userService;
         this.chatMessageRepository = chatMessageRepository;
-        this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
     @Override
     public void addMessageToAppointmentChat(int appointmentId, int authorId, ChatMessage chatMessage) {
@@ -41,7 +42,7 @@ public class AppointmentChatServiceImpl implements AppointmentChatService{
             chatMessage.setAppointment(appointment);
             chatMessage.setCreatedAt(LocalDateTime.now());
             chatMessageRepository.save(chatMessage);
-            notificationService.newChatMessageNotification(chatMessage, true);
+            eventPublisher.publishEvent(new ChatMessageEvent(chatMessage));
         } else {
             throw new org.springframework.security.access.AccessDeniedException("Unauthorized");
         }  

@@ -1,6 +1,11 @@
 package com.example.slabiak.appointmentscheduler.service.impl;
 
+import com.example.slabiak.appointmentscheduler.service.impl.event.AppointmentCanceledByCustomerEvent;
+import com.example.slabiak.appointmentscheduler.service.impl.event.AppointmentCanceledByProviderEvent;
+import com.example.slabiak.appointmentscheduler.service.impl.event.AppointmentRejectionAcceptedEvent;
+import com.example.slabiak.appointmentscheduler.service.impl.event.AppointmentRejectionRequestedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.example.slabiak.appointmentscheduler.dao.AppointmentRepository;
@@ -14,11 +19,13 @@ import com.example.slabiak.appointmentscheduler.service.UserService;
 public class AppointmentRejectionServiceImpl implements AppointmentRejectionService {
     private final AppointmentRepository appointmentRepository;
     private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public AppointmentRejectionServiceImpl(AppointmentRepository appointmentRepository, UserService userService){
+    public AppointmentRejectionServiceImpl(AppointmentRepository appointmentRepository, UserService userService, ApplicationEventPublisher eventPublisher) {
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -49,6 +56,15 @@ public class AppointmentRejectionServiceImpl implements AppointmentRejectionServ
             throw new IllegalStateException(reason);
         }
         appointment.cancel(user);
+
+        if(user.equals(appointment.getCustomer())) {
+            eventPublisher.publishEvent(new AppointmentCanceledByCustomerEvent(appointment));
+        }
+
+        if(user.equals(appointment.getProvider())) {
+            eventPublisher.publishEvent(new AppointmentCanceledByProviderEvent(appointment));
+        }
+
         appointmentRepository.save(appointment);
     }
 
@@ -68,6 +84,7 @@ public class AppointmentRejectionServiceImpl implements AppointmentRejectionServ
             .orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
         
         appointment.setRejectionRequested(true);
+        eventPublisher.publishEvent(new AppointmentRejectionRequestedEvent(appointment));
         appointmentRepository.save(appointment);
         return true;
     }
@@ -88,6 +105,7 @@ public class AppointmentRejectionServiceImpl implements AppointmentRejectionServ
             .orElseThrow(() -> new IllegalArgumentException("Appointment not found."));
             
         appointment.setStatus(AppointmentStatus.CANCELED);
+        eventPublisher.publishEvent(new AppointmentRejectionAcceptedEvent(appointment));
         appointmentRepository.save(appointment);
         return true;
 

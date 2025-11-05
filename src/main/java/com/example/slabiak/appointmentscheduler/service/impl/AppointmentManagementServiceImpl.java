@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
+import com.example.slabiak.appointmentscheduler.service.impl.event.NewAppointmentScheduleEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,6 @@ import com.example.slabiak.appointmentscheduler.entity.user.customer.Customer;
 import com.example.slabiak.appointmentscheduler.entity.user.provider.Provider;
 import com.example.slabiak.appointmentscheduler.exception.AppointmentNotFoundException;
 import com.example.slabiak.appointmentscheduler.service.AppointmentManagementService;
-import com.example.slabiak.appointmentscheduler.service.NotificationService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
 import com.example.slabiak.appointmentscheduler.service.WorkService;
 
@@ -26,18 +27,18 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
     private final AppointmentRepository appointmentRepository;
     private final UserService userService;
     private final WorkService workService;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public AppointmentManagementServiceImpl(AppointmentRepository appointmentRepository,
                                             UserService userService,
                                             WorkService workService,
-                                            NotificationService notificationService    
+                                            ApplicationEventPublisher eventPublisher
     ){
         this.appointmentRepository = appointmentRepository;
         this.userService = userService;
         this.workService = workService;
-        this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
 
     }
 
@@ -56,7 +57,7 @@ public class AppointmentManagementServiceImpl implements AppointmentManagementSe
         appointment.setEnd(start.plusMinutes(work.getDuration()));
 
         appointmentRepository.save(appointment);
-        notificationService.newNewAppointmentScheduledNotification(appointment, true);
+        eventPublisher.publishEvent(new NewAppointmentScheduleEvent(appointment));
         return appointment;
     }
 

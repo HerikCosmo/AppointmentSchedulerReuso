@@ -6,8 +6,10 @@ import com.example.slabiak.appointmentscheduler.entity.user.User;
 import com.example.slabiak.appointmentscheduler.service.EmailService;
 import com.example.slabiak.appointmentscheduler.service.NotificationService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
+import com.example.slabiak.appointmentscheduler.service.impl.event.*;
 import com.example.slabiak.appointmentscheduler.service.impl.notification.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -75,68 +77,69 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.getAllUnreadNotifications(userId);
     }
 
-    @Override
-    public void newAppointmentFinishedNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentFinishedNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleAppointmentFinished(AppointmentFinishedEvent event) {
+        new AppointmentFinishedNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newAppointmentRejectionRequestedNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentRejectionRequestedNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleAppointmentRejectionRequested(AppointmentRejectionRequestedEvent event) {
+        new AppointmentRejectionRequestedNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newNewAppointmentScheduledNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentScheduledNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleNewAppointmentSchedule(NewAppointmentScheduleEvent event) {
+        new AppointmentScheduledNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newAppointmentCanceledByCustomerNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentCanceledByCustomerNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleAppointmentCanceledByCustomer(AppointmentCanceledByCustomerEvent event) {
+        new AppointmentCanceledByCustomerNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newAppointmentCanceledByProviderNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentCanceledByProviderNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleAppointmentCanceledByProvider(AppointmentCanceledByProviderEvent event) {
+        new AppointmentCanceledByProviderNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    public void newInvoice(Invoice invoice, boolean sendEmail) {
-        new InvoiceNotification(invoice, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleNewInvoice(InvoiceEvent event) {
+        new InvoiceNotification(event.getInvoice(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newExchangeRequestedNotification(Appointment oldAppointment, Appointment newAppointment, boolean sendEmail) {
-        new ExchangeRequestedNotification(oldAppointment, newAppointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleExchangeRequest(ExchangeRequestedEvent event) {
+        new ExchangeRequestedNotification(event.getOldAppointment(), event.getNewAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newExchangeAcceptedNotification(ExchangeRequest exchangeRequest, boolean sendEmail) {
-        new ExchangeAcceptedNotification(exchangeRequest, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleExchangeAccepted(ExchangeAcceptedEvent event) {
+        new ExchangeAcceptedNotification(event.getExchangeRequest(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newExchangeRejectedNotification(ExchangeRequest exchangeRequest, boolean sendEmail) {
-        new ExchangeRejectedNotification(exchangeRequest, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleExchangeRejected(ExchangeRejectedEvent event) {
+        new ExchangeRejectedNotification(event.getExchangeRequest(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newAppointmentRejectionAcceptedNotification(Appointment appointment, boolean sendEmail) {
-        new AppointmentRejectionAcceptedNotification(appointment, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleAppointmentRejectAccepted(AppointmentRejectionAcceptedEvent event) {
+        new AppointmentRejectionAcceptedNotification(event.getAppointment(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 
-    @Override
-    public void newChatMessageNotification(ChatMessage chatMessage, boolean sendEmail) {
-        new ChatMessageNotification(chatMessage, this, emailService, mailingEnabled)
-                .sendNotification(sendEmail);
+    @EventListener
+    public void handleChatMessage(ChatMessageEvent event) {
+        new ChatMessageNotification(event.getChatMessage(), this, emailService, mailingEnabled)
+                .sendNotification(true);
     }
 }
