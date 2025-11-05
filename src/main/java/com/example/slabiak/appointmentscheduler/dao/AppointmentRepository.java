@@ -53,6 +53,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     @Query("select a from Appointment a where a.status = 'EXCHANGE_REQUESTED' and a.start <= :start")
     List<Appointment> findExchangeRequestedWithStartBefore(@Param("start") LocalDateTime date);
 
-    @Query("SELECT a FROM Appointment a WHERE a.provider.id = :providerId AND DATE(a.start) = :date")
-    List<Appointment> findByProviderAndDay(@Param("providerId") int providerId, @Param("date") LocalDate date);   
+    List<Appointment> findByProviderIdAndStartBetween(int providerId, LocalDateTime dayStart, LocalDateTime dayEnd);
 }
