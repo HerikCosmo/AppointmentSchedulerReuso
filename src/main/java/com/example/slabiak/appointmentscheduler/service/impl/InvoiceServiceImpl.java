@@ -8,9 +8,10 @@ import com.example.slabiak.appointmentscheduler.entity.user.customer.Customer;
 import com.example.slabiak.appointmentscheduler.security.CustomUserDetails;
 import com.example.slabiak.appointmentscheduler.service.AppointmentService;
 import com.example.slabiak.appointmentscheduler.service.InvoiceService;
-import com.example.slabiak.appointmentscheduler.service.NotificationService;
 import com.example.slabiak.appointmentscheduler.service.UserService;
+import com.example.slabiak.appointmentscheduler.service.impl.event.InvoiceEvent;
 import com.example.slabiak.appointmentscheduler.util.PdfGeneratorUtil;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,14 +30,20 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PdfGeneratorUtil pdfGeneratorUtil;
     private final UserService userService;
     private final AppointmentService appointmentService;
-    private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, PdfGeneratorUtil pdfGeneratorUtil, UserService userService, AppointmentService appointmentService, NotificationService notificationService) {
+    public InvoiceServiceImpl(
+            InvoiceRepository invoiceRepository,
+            PdfGeneratorUtil pdfGeneratorUtil,
+            UserService userService,
+            AppointmentService appointmentService,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.invoiceRepository = invoiceRepository;
         this.pdfGeneratorUtil = pdfGeneratorUtil;
         this.userService = userService;
         this.appointmentService = appointmentService;
-        this.notificationService = notificationService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -114,7 +121,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 }
                 Invoice invoice = new Invoice(generateInvoiceNumber(), "issued", LocalDateTime.now(), appointmentsToIssueInvoice);
                 invoiceRepository.save(invoice);
-                notificationService.newInvoice(invoice, true);
+                eventPublisher.publishEvent(new InvoiceEvent(invoice));
             }
 
         }
